@@ -7,6 +7,12 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://*:{port}");
+}
+
 // Configurar Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
@@ -75,13 +81,13 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline
+app.UseSwagger();
+app.UseSwaggerUI();
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHttpsRedirection();
 }
-
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();

@@ -1,28 +1,32 @@
-﻿# Build stage
+﻿# ========= ETAPA DE BUILD =========
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /repo
 
-# Copy entire source structure
+WORKDIR /src
+
+# Copiar archivos de solución y proyectos
+COPY Casa106.sln ./
+COPY src/Casa106.Api/Casa106.Api.csproj src/Casa106.Api/
+COPY src/Casa106.Application/Casa106.Application.csproj src/Casa106.Application/
+COPY src/Casa106.Domain/Casa106.Domain.csproj src/Casa106.Domain/
+COPY src/Casa106.Infrastructure/Casa106.Infrastructure.csproj src/Casa106.Infrastructure/
+
+# Restaurar paquetes
+RUN dotnet restore Casa106.sln
+
+# Copiar el resto del código
 COPY . .
 
-# Restore ALL packages from the SOLUTION (this ensures Application.Abstractions is available)
-RUN dotnet restore "Casa106.sln"
+# Publicar la API
+RUN dotnet publish src/Casa106.Api/Casa106.Api.csproj \
+    -c Release \
+    -o /app/publish \
+    /p:UseAppHost=false
 
-# Build only the Api (NOT the entire solution to avoid compiling the React Web project)
-# Api transitively compiles Domain → Application → Infrastructure
-RUN dotnet build "src/Casa106.Api/Casa106.Api.csproj" -c Release --no-restore
+# ========= ETAPA DE RUNTIME =========
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 
-# Publish only the Api
-RUN dotnet publish "src/Casa106.Api/Casa106.Api.csproj" -c Release -o /app/publish --no-restore
-# Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
-# Create upload directory
-RUN mkdir -p /app/uploads
-# Set environment variables
-ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:8080
-# Copy published app
+
 COPY --from=build /app/publish .
-EXPOSE 8080
+
 ENTRYPOINT ["dotnet", "Casa106.Api.dll"]

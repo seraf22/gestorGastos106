@@ -1,18 +1,5 @@
-**/.git
-**/.vs
-**/.vscode
-**/bin
-**/obj
-**/node_modules
-**/.env
-**/*.user
-**/*.suo
-**/.DS_Store
-**/Thumbs.db
-
-# Archivos de upload locales
-src/Casa106.Api/uploads
-
-# Frontend (no se compila en el contenedor API)
-src/Casa106.Web/dist
-src/Casa106.Web/node_modules
+**/bin/
+**/obj/
+.vs/
+.git/
+.gitignore

@@ -2,22 +2,23 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /repo
 
-# Copiar archivos de solución y proyectos primero para aprovechar caché de capas
+# Copiar archivos de solución y proyectos primero
 COPY Casa106.sln .
 COPY src/Casa106.Domain/Casa106.Domain.csproj          src/Casa106.Domain/
 COPY src/Casa106.Application/Casa106.Application.csproj src/Casa106.Application/
 COPY src/Casa106.Infrastructure/Casa106.Infrastructure.csproj src/Casa106.Infrastructure/
 COPY src/Casa106.Api/Casa106.Api.csproj                src/Casa106.Api/
 
-# Restaurar solo los proyectos .NET (excluir el proyecto de React)
-RUN dotnet restore src/Casa106.Api/Casa106.Api.csproj \
-	--ignore-failed-sources
-
-# Copiar el resto del código fuente
+# Copiar TODOS los archivos de código fuente .NET ANTES de restore
+# Esto asegura que las referencias de proyecto se resuelvan correctamente
 COPY src/Casa106.Domain/       src/Casa106.Domain/
 COPY src/Casa106.Application/  src/Casa106.Application/
 COPY src/Casa106.Infrastructure/ src/Casa106.Infrastructure/
 COPY src/Casa106.Api/          src/Casa106.Api/
+
+# Ahora restaurar después de que toda la estructura esté presente
+RUN dotnet restore src/Casa106.Api/Casa106.Api.csproj \
+	--ignore-failed-sources
 
 # Publicar en modo Release
 RUN dotnet publish src/Casa106.Api/Casa106.Api.csproj \
@@ -42,4 +43,4 @@ COPY --from=build /app/publish .
 
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "Casa106.Api.dll"]
+ENTRYPOINT ["dotnet", "Casa106.Api.dll"]ENTRYPOINT ["dotnet", "Casa106.Api.dll"]

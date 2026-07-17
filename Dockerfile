@@ -9,8 +9,8 @@ COPY src/Casa106.Application/Casa106.Application.csproj src/Casa106.Application/
 COPY src/Casa106.Infrastructure/Casa106.Infrastructure.csproj src/Casa106.Infrastructure/
 COPY src/Casa106.Api/Casa106.Api.csproj                src/Casa106.Api/
 
-# Restaurar solo los proyectos .NET (excluir el esproj de React)
-RUN dotnet restore Casa106.sln \
+# Restaurar solo los proyectos .NET (excluir el proyecto de React)
+RUN dotnet restore src/Casa106.Api/Casa106.Api.csproj \
 	--ignore-failed-sources
 
 # Copiar el resto del código fuente

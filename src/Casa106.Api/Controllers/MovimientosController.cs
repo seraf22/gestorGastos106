@@ -79,7 +79,10 @@ public class MovimientosController : ControllerBase
             Tipo = Enum.Parse<TipoMovimiento>(request.Tipo),
             Estado = EstadoMovimiento.Confirmado,
             Origen = OrigenMovimiento.Manual,
-            FechaMovimiento = request.FechaMovimiento,
+            FechaMovimiento = DateTime.SpecifyKind(
+                request.FechaMovimiento,
+                DateTimeKind.Utc
+            ),
             PeriodoDesde = request.PeriodoDesde,
             PeriodoHasta = request.PeriodoHasta,
             Monto = request.Monto,

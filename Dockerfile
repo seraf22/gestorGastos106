@@ -5,13 +5,13 @@ WORKDIR /repo
 # Copy entire source structure
 COPY . .
 
-# Restore packages
-RUN dotnet restore "src/Casa106.Api/Casa106.Api.csproj"
+# Restore ALL packages (this is critical - must also restore Application.Abstractions)
+RUN dotnet restore "Casa106.sln"
 
-# Build the entire solution to compile all dependencies (including Application.Abstractions)
-RUN dotnet build "src/Casa106.Api/Casa106.Api.csproj" -c Release --no-restore
+# Build the entire SOLUTION (not just the Api project)
+RUN dotnet build "Casa106.sln" -c Release --no-restore
 
-# Publish
+# Publish only the Api
 RUN dotnet publish "src/Casa106.Api/Casa106.Api.csproj" -c Release -o /app/publish --no-restore
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime

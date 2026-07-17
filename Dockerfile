@@ -5,11 +5,12 @@ WORKDIR /repo
 # Copy entire source structure
 COPY . .
 
-# Restore ALL packages (this is critical - must also restore Application.Abstractions)
+# Restore ALL packages from the SOLUTION (this ensures Application.Abstractions is available)
 RUN dotnet restore "Casa106.sln"
 
-# Build the entire SOLUTION (not just the Api project)
-RUN dotnet build "Casa106.sln" -c Release --no-restore
+# Build only the Api (NOT the entire solution to avoid compiling the React Web project)
+# Api transitively compiles Domain → Application → Infrastructure
+RUN dotnet build "src/Casa106.Api/Casa106.Api.csproj" -c Release --no-restore
 
 # Publish only the Api
 RUN dotnet publish "src/Casa106.Api/Casa106.Api.csproj" -c Release -o /app/publish --no-restore
